@@ -26,11 +26,25 @@ class Controller
     end 
 
     def begin_game 
-        #shuffle all Fact instances and pop off the last fact
+        #shuffle all Fact instances and store in variable facts
         facts=Fact.all.shuffle
-        fact=facts.pop
-        #start making questions fall down screen
-        fact.fact
+        score=0
+        lives=3
+        
+        while lives>0 do 
+            fact=facts.pop
+            #start making questions fall down screen
+            fact.fact
+
+            answer=gets.chomp 
+            #if the answer is correct
+            if (answer.downcase=="t" && fact.true_or_false=="True") || (answer.downcase=="f" && fact.true_or_false=="False")
+                score+=1
+            #if the answer is wrong 
+            else 
+                lives-=1 
+            end 
+        end 
     end 
 
     def self.welcome 
