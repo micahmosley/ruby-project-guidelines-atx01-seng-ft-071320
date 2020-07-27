@@ -26,7 +26,11 @@ class Controller
     end 
 
     def begin_game 
-        
+        #shuffle all Fact instances and pop off the last fact
+        facts=Fact.all.shuffle
+        fact=facts.pop
+        #start making questions fall down screen
+        fact.fact
     end 
 
     def self.welcome 
