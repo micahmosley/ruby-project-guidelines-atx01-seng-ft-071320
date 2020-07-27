@@ -1,4 +1,5 @@
 require_relative '../config/environment'
+
 def print_text(lines_top, lines_bottom, text)
     lines_top.times do
         print "\n"
@@ -27,5 +28,7 @@ while bottomlines >= 0
     print_text(lines - bottomlines, bottomlines, text)
     bottomlines -= 1
 end
+
+
 
 
