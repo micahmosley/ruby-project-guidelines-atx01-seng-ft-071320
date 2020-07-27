@@ -31,6 +31,7 @@ class Controller
         score=0
         lives=3
         
+        #need to make a case for if we run out of questions
         while lives>0 do 
             fact=facts.pop
             #start making questions fall down screen
