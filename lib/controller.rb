@@ -105,7 +105,13 @@ class Controller
             scrolling_text = Thread.new{
                 spaces = rand(150)
                 while bottomlines >= 0
-                    sleep(1)
+                    if @@current_game.score<5
+                        sleep(1)
+                    elsif @@current_game.score>=5 && @@current_game.score<10
+                        sleep(.8)
+                    else 
+                        sleep(.5)
+                    end
                     print_text(lines - bottomlines, bottomlines, spaces, fact.fact)
                     bottomlines -= 1
                 end
