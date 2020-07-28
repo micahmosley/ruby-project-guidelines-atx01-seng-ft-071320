@@ -14,7 +14,7 @@ class Controller
 
         #if user knows how to play start game. else, go over rules
         if y_or_n.downcase=="y"
-            begin_game 
+            begin_game(current_game)
         elsif y_or_n.downcase=="n"
             rules
         else 
@@ -25,26 +25,18 @@ class Controller
         end 
     end 
 
-    def begin_game 
+    def begin_game (game_instance)
         #shuffle all Fact instances and store in variable facts
         facts=Fact.all.shuffle
-        score=0
+        game_instance.score=0
         lives=3
         
         #need to make a case for if we run out of questions
         while lives>0 do 
             fact=facts.pop
-            #start making questions fall down screen
-            fact.fact
-
-            answer=gets.chomp 
-            #if the answer is correct
-            if (answer.downcase=="t" && fact.true_or_false=="True") || (answer.downcase=="f" && fact.true_or_false=="False")
-                score+=1
-            #if the answer is wrong 
-            else 
-                lives-=1 
-            end 
+            #Ask a question that will begin falling down screen
+            ask_question (10, fact.fact, game_instance, lives, fact)
+           
         end 
     end 
 
@@ -90,7 +82,91 @@ class Controller
         end 
     end 
 
+    #method that prints test in the correct vertical position
+    def print_text(lines_top, lines_bottom, spaces, text)
+        puts "\e[2J\e[f"
+        lines_top.times do
+            print "\n"
+        end
+        spaces.times do
+            print " "
+        end
+        print text
+        lines_bottom.times do
+            print "\n"
+        end
+    end
 
+#method that sends a fact falling from the top of the screen and takes in an answer
+    def ask_question(lines, text, game_instance, lives, fact)
+        bottomlines = lines
+        timed_out=false
+        scrolling_text = Thread.new{
+            spaces = rand(150)
+            while bottomlines >= 0
+                sleep(1)
+                print_text(lines - bottomlines, bottomlines, spaces, text)
+                bottomlines -= 1
+            end
+            timed_out=true
+            print_text(5, 5, 10, "you lose!")
+        }
+        
+        
+        answer = gets.chomp
+        if (answer.downcase=="t" && fact.true_or_false=="True" && timed_out==false) || (answer.downcase=="f" && fact.true_or_false=="False" &&timed_out==false)
+            scrolling_text.kill
+            game_instance.score+=1
+        else
+            scrolling_text.kill
+            lives-=1
+        end
+        scrolling_text.join
+    end
 
+    def game_over_screen
+        print ("                                             .         .                                                                                                   
+            ,o888888o.         .8.                  ,8.       ,8.         8 8888888888               ,o888888o. `8.`888b           ,8'8 8888888888  8 888888888o.  
+           8888     `88.      .888.                ,888.     ,888.        8 8888                  . 8888     `88.`8.`888b         ,8' 8 8888        8 8888    `88. 
+        ,8 8888       `8.    :88888.              .`8888.   .`8888.       8 8888                 ,8 8888       `8b`8.`888b       ,8'  8 8888        8 8888     `88 
+        88 8888             . `88888.            ,8.`8888. ,8.`8888.      8 8888                 88 8888        `8b`8.`888b     ,8'   8 8888        8 8888     ,88 
+        88 8888            .8. `88888.          ,8'8.`8888,8^8.`8888.     8 888888888888         88 8888         88 `8.`888b   ,8'    8 8888888888888 8888.   ,88' 
+        88 8888           .8`8. `88888.        ,8' `8.`8888' `8.`8888.    8 8888                 88 8888         88  `8.`888b ,8'     8 8888        8 888888888P'  
+        88 8888   8888888.8' `8. `88888.      ,8'   `8.`88'   `8.`8888.   8 8888                 88 8888        ,8P   `8.`888b8'      8 8888        8 8888`8b      
+        `8 8888       .8.8'   `8. `88888.    ,8'     `8.`'     `8.`8888.  8 8888                 `8 8888       ,8P     `8.`888'       8 8888        8 8888 `8b.    
+           8888     ,88.888888888. `88888.  ,8'       `8        `8.`8888. 8 8888                  ` 8888     ,88'       `8.`8'        8 8888        8 8888   `8b.  
+            `8888888P'.8'       `8. `88888.,8'         `         `8.`8888.8 888888888888             `8888888P'          `8.`         8 8888888888888 8888     `88.  ")
+    end
+
+    def high_scores_title
+        print("                                                                                                                           
+        8 8888        8 8 8888            d888888o.      ,o888888o.       ,o888888o.    8 888888888o.  8 8888888888    d888888o.  
+        8 8888        8 8 8888          .`8888:' `88.   8888     `88.  . 8888     `88.  8 8888    `88. 8 8888        .`8888:' `88.
+        8 8888        8 8 8888          8.`8888.   Y8,8 8888       `8.,8 8888       `8b 8 8888     `88 8 8888        8.`8888.   Y8
+        8 8888        8 8 8888          `8.`8888.    88 8888          88 8888        `8b8 8888     ,88 8 8888        `8.`8888.    
+        8 8888        8 8 8888           `8.`8888.   88 8888          88 8888         888 8888.   ,88' 8 888888888888 `8.`8888.   
+        8 8888        8 8 8888            `8.`8888.  88 8888          88 8888         888 888888888P'  8 8888          `8.`8888.  
+        8 8888888888888 8 8888             `8.`8888. 88 8888          88 8888        ,8P8 8888`8b      8 8888           `8.`8888. 
+        8 8888        8 8 8888         8b   `8.`8888.`8 8888       .8'`8 8888       ,8P 8 8888 `8b.    8 8888       8b   `8.`8888.
+        8 8888        8 8 8888         `8b.  ;8.`8888   8888     ,88'  ` 8888     ,88'  8 8888   `8b.  8 8888       `8b.  ;8.`8888
+        8 8888        8 8 8888          `Y8888P ,88P'    `8888888P'       `8888888P'    8 8888     `88.8 888888888888`Y8888P ,88P'")
+    end
+
+    def main_menu
+        print ("
+              .         .                                                                         .         .                                                      
+             ,8.       ,8.                  .8.          8 8888b.             8                  ,8.       ,8.         8 8888888888  b.             88 8888      88
+            ,888.     ,888.                .888.         8 8888888o.          8                 ,888.     ,888.        8 8888        888o.          88 8888      88
+           .`8888.   .`8888.              :88888.        8 8888Y88888o.       8                .`8888.   .`8888.       8 8888        Y88888o.       88 8888      88
+          ,8.`8888. ,8.`8888.            . `88888.       8 8888.`Y888888o.    8               ,8.`8888. ,8.`8888.      8 8888        .`Y888888o.    88 8888      88
+         ,8'8.`8888,8^8.`8888.          .8. `88888.      8 88888o. `Y888888o. 8              ,8'8.`8888,8^8.`8888.     8 8888888888888o. `Y888888o. 88 8888      88
+        ,8' `8.`8888' `8.`8888.        .8`8. `88888.     8 88888`Y8o. `Y88888o8             ,8' `8.`8888' `8.`8888.    8 8888        8`Y8o. `Y88888o88 8888      88
+       ,8'   `8.`88'   `8.`8888.      .8' `8. `88888.    8 88888   `Y8o. `Y8888            ,8'   `8.`88'   `8.`8888.   8 8888        8   `Y8o. `Y88888 8888      88
+      ,8'     `8.`'     `8.`8888.    .8'   `8. `88888.   8 88888      `Y8o. `Y8           ,8'     `8.`'     `8.`8888.  8 8888        8      `Y8o. `Y8` 8888     ,8P
+     ,8'       `8        `8.`8888.  .888888888. `88888.  8 88888         `Y8o.`          ,8'       `8        `8.`8888. 8 8888        8         `Y8o.`  8888   ,d8P 
+    ,8'         `         `8.`8888..8'       `8. `88888. 8 88888            `Yo         ,8'         `         `8.`8888.8 8888888888888            `Yo   `Y88888P'  ")
+    end
+    
+    
 
 end 
