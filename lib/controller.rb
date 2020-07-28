@@ -6,7 +6,7 @@ class Controller
         name=gets.chomp
 
         #create new instance of game and store user's name into username
-        current_game=Game.new(username: name)
+        @@current_game=Game.new(username: name)
 
         puts "Mighty #{name}! Welcome to ____!"
         puts "Do you know how to play? (Y/N)"
@@ -14,7 +14,7 @@ class Controller
 
         #if user knows how to play start game. else, go over rules
         if y_or_n.downcase=="y"
-            begin_game(current_game)
+            begin_game
         elsif y_or_n.downcase=="n"
             rules
         else 
@@ -25,17 +25,17 @@ class Controller
         end 
     end 
 
-    def begin_game (game_instance)
+    def begin_game 
         #shuffle all Fact instances and store in variable facts
         facts=Fact.all.shuffle
-        game_instance.score=0
-        lives=3
+        @@current_game.score=0
+        @@lives=3
         
         #need to make a case for if we run out of questions
-        while lives>0 do 
+        while @@lives>0 do 
             fact=facts.pop
             #Ask a question that will begin falling down screen
-            ask_question (10, fact.fact, game_instance, lives, fact)
+            ask_question(10, fact)
            
         end 
     end 
@@ -98,7 +98,7 @@ class Controller
     end
 
 #method that sends a fact falling from the top of the screen and takes in an answer
-    def ask_question(lines, text, game_instance, lives, fact)
+    def ask_question(lines, fact)
         bottomlines = lines
         
         begin
@@ -106,7 +106,7 @@ class Controller
                 spaces = rand(150)
                 while bottomlines >= 0
                     sleep(1)
-                    print_text(lines - bottomlines, bottomlines, spaces, text)
+                    print_text(lines - bottomlines, bottomlines, spaces, fact.fact)
                     bottomlines -= 1
                 end
             }
@@ -115,10 +115,10 @@ class Controller
             get answer = Timeout::timeout(lines) {answer = gets.chomp}
             if (get_answer.downcase=="t" && fact.true_or_false=="True") || (get_answer.downcase=="f" && fact.true_or_false=="False")
                 scrolling_text.kill
-                game_instance.score+=1
+                @@current_game.score+=1
             else
                 scrolling_text.kill
-                lives-=1
+                @@lives-=1
             end
             scrolling_text.join
         rescue Timeout::Error
