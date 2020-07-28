@@ -100,28 +100,30 @@ class Controller
 #method that sends a fact falling from the top of the screen and takes in an answer
     def ask_question(lines, text, game_instance, lives, fact)
         bottomlines = lines
-        timed_out=false
-        scrolling_text = Thread.new{
-            spaces = rand(150)
-            while bottomlines >= 0
-                sleep(1)
-                print_text(lines - bottomlines, bottomlines, spaces, text)
-                bottomlines -= 1
+        
+        begin
+            scrolling_text = Thread.new{
+                spaces = rand(150)
+                while bottomlines >= 0
+                    sleep(1)
+                    print_text(lines - bottomlines, bottomlines, spaces, text)
+                    bottomlines -= 1
+                end
+            }
+            
+            
+            get answer = Timeout::timeout(lines) {answer = gets.chomp}
+            if (get_answer.downcase=="t" && fact.true_or_false=="True") || (get_answer.downcase=="f" && fact.true_or_false=="False")
+                scrolling_text.kill
+                game_instance.score+=1
+            else
+                scrolling_text.kill
+                lives-=1
             end
-            timed_out=true
-            print_text(5, 5, 10, "you lose!")
-        }
-        
-        
-        answer = gets.chomp
-        if (answer.downcase=="t" && fact.true_or_false=="True" && timed_out==false) || (answer.downcase=="f" && fact.true_or_false=="False" &&timed_out==false)
-            scrolling_text.kill
-            game_instance.score+=1
-        else
-            scrolling_text.kill
-            lives-=1
+            scrolling_text.join
+        rescue Timeout::Error
+            print_test(5,5,10, "you lose!")
         end
-        scrolling_text.join
     end
 
     def game_over_screen
