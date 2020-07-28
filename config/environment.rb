@@ -2,6 +2,7 @@ require 'bundler'
 require 'net/http'
 require 'open-uri'
 require 'json'
+require 'timeout'
 Bundler.require
 
 

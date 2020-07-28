@@ -19,25 +19,29 @@ end
 def ask_question(lines, text)
     bottomlines = lines
 
-    scrolling_text = Thread.new{
-        spaces = rand(150)
-        while bottomlines >= 0
-            sleep(1)
-            print_text(lines - bottomlines, bottomlines, spaces, text)
-            bottomlines -= 1
-        end
-        print_text(5, 5, 10, "you lose!")
-    }
+    begin
+        scrolling_text = Thread.new{
+            spaces = rand(150)
+            while bottomlines >= 0
+                sleep(1)
+                print_text(lines - bottomlines, bottomlines, spaces, text)
+                bottomlines -= 1
+            end
+        }
 
-    answer = gets.chomp
-    if answer == "t"
-        scrolling_text.kill
-        print_text(5, 5, 10, "you win!")
-    else
-        scrolling_text.kill
+        get_answer = Timeout::timeout(lines) {answer = gets.chomp}
+        if get_answer == "t"
+            scrolling_text.kill
+            print_text(5, 5, 10, "you win")
+        else
+            scrolling_text.kill
+            print_text(5, 5, 10, "you lose!")
+        end
+        scrolling_text.join
+    rescue Timeout::Error
         print_text(5, 5, 10, "you lose!")
     end
-    scrolling_text.join
+
 end
 
 def game_over_screen
@@ -84,4 +88,5 @@ def main_menu
 end
 
 
-
+ask_question(10, "hello")
+ask_question(10, "goodbye")
