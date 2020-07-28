@@ -88,5 +88,5 @@ def main_menu
 end
 
 
-ask_question(10, "hello")
-ask_question(10, "goodbye")
+game = Controller.new
+game.intro

@@ -103,14 +103,14 @@ class Controller
         
         begin
             scrolling_text = Thread.new{
-                spaces = rand(150)
+                spaces = rand(100)
                 while bottomlines >= 0
                     if @@current_game.score<5
                         sleep(1)
                     elsif @@current_game.score>=5 && @@current_game.score<10
-                        sleep(.8)
+                        sleep(0.8)
                     else 
-                        sleep(.5)
+                        sleep(0.5)
                     end
                     print_text(lines - bottomlines, bottomlines, spaces, fact.fact)
                     bottomlines -= 1
@@ -118,7 +118,7 @@ class Controller
             }
             
             
-            get answer = Timeout::timeout(lines) {answer = gets.chomp}
+            get_answer = Timeout::timeout(lines) {answer = gets.chomp}
             if (get_answer.downcase=="t" && fact.true_or_false=="True") || (get_answer.downcase=="f" && fact.true_or_false=="False")
                 scrolling_text.kill
                 @@current_game.score+=1
