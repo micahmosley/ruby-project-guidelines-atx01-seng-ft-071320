@@ -21,12 +21,15 @@ class Controller
             begin_game
         elsif y_or_n.downcase=="n"
             rules
+            start_game?
         else 
             start_game?
         end 
     end
 
     def begin_game 
+
+        
         #shuffle all Fact instances and store in variable facts
         facts=Fact.all.shuffle
         @@current_game.score=0
@@ -84,7 +87,6 @@ class Controller
 
         sleep(3)
 
-        start_game?
     end
 
     #method that prints test in the correct vertical position
@@ -138,12 +140,17 @@ class Controller
                 question.answered_correctly = false
             end
             print_text(5, 5, 75, question.fact.true_or_false)
+            sleep(1)
+            print_text(5, 5, 75, "Current lives: #{@@lives}")
+
             scrolling_text.join
         rescue Timeout::Error
             scrolling_text.kill
             @@lives -= 1
             question.answered_correctly = false
             print_text(5, 5, 75, question.fact.true_or_false)
+            sleep(1)
+            print_text(5, 5, 75, "Current lives: #{@@lives}")
         end
     end
 
@@ -188,7 +195,27 @@ class Controller
       ,8'     `8.`'     `8.`8888.    .8'   `8. `88888.   8 88888      `Y8o. `Y8           ,8'     `8.`'     `8.`8888.  8 8888        8      `Y8o. `Y8` 8888     ,8P
      ,8'       `8        `8.`8888.  .888888888. `88888.  8 88888         `Y8o.`          ,8'       `8        `8.`8888. 8 8888        8         `Y8o.`  8888   ,d8P 
     ,8'         `         `8.`8888..8'       `8. `88888. 8 88888            `Yo         ,8'         `         `8.`8888.8 8888888888888            `Yo   `Y88888P'  ".yellowish)
-    end
+
+        puts "Main Menu".red
+        puts "1. New Game"
+        puts "2. High Scores"
+        puts "3. Rules"
+        print "Enter 1 to start a new game; 2 for High Scores; 3 to go over the rules: "
+
+        choice=gets.chomp
+
+        if choice=="1"
+            return 
+        elsif choice=="2"
+            Game.high_scores
+            main_menu
+        elsif choice=="3"
+            rules
+            main_menu 
+        else 
+            main_menu
+        end
+    end 
     
     
 
