@@ -34,7 +34,6 @@ class Controller
         facts=Fact.all.shuffle
         @@current_game.score=0
         @@lives=3
-        game = @@current_game
         
         #need to make a case for if we run out of questions
         while @@lives>0 do 
@@ -62,7 +61,7 @@ class Controller
         if y_or_n.downcase=="y"
             @@last_game = @@current_game
             @@current_game = Game.new(username: @@last_game.username)
-            intro
+            begin_game
         elsif y_or_n.downcase=="n"
             return
         else
