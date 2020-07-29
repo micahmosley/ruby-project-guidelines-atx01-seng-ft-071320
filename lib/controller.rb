@@ -31,13 +31,14 @@ class Controller
         facts=Fact.all.shuffle
         @@current_game.score=0
         @@lives=3
+        game = @@current_game
         
         #need to make a case for if we run out of questions
         while @@lives>0 do 
             fact=facts.pop
             #Ask a question that will begin falling down screen
             ask_question(10, fact)
-            break if (Question.all.length >= 50)
+            break if Question.all.where("game_id = ?", @@current_game.id).length >= 50
         end 
 
         game_over
@@ -58,7 +59,7 @@ class Controller
         if y_or_n.downcase=="y"
             @@last_game = @@current_game
             @@current_game = Game.new(username: @@last_game.username)
-            begin_game
+            intro
         elsif y_or_n.downcase=="n"
             return
         else
@@ -122,9 +123,9 @@ class Controller
                     end
                     print_text(lines - bottomlines, bottomlines, spaces, question.fact.fact)
                     bottomlines -= 1
+                    puts("=" * 150)
                 end
             }
-            
             
             get_answer = Timeout::timeout(timer) {answer = gets.chomp}
             if (get_answer.downcase=="t" && question.fact.true_or_false=="True") || (get_answer.downcase=="f" && question.fact.true_or_false=="False")
@@ -141,6 +142,8 @@ class Controller
         rescue Timeout::Error
             scrolling_text.kill
             @@lives -= 1
+            question.answered_correctly = false
+            print_text(5, 5, 75, question.fact.true_or_false)
         end
     end
 
