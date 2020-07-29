@@ -105,7 +105,7 @@ class Controller
     def ask_question(lines, fact)
         bottomlines = lines
         timer = lines
-        question = Question.new(game: @@current_game, fact: fact)
+        question = Question.create(game: @@current_game, fact: fact)
         
         begin
             scrolling_text = Thread.new{
