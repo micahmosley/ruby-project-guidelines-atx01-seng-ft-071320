@@ -207,6 +207,7 @@ class Controller
             return 
         elsif choice=="2"
             Game.high_scores
+            sleep(3)
             main_menu
         elsif choice=="3"
             rules
