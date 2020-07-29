@@ -1,7 +1,7 @@
 class Controller
 
     def intro
-        Controller.welcome
+        main_menu
         puts "Hello, brave user. What is your name?"
         name=gets.chomp
 
@@ -9,6 +9,10 @@ class Controller
         @@current_game=Game.new(username: name)
 
         puts "Mighty #{name}! Welcome to ____!"
+        start_game?
+    end 
+
+    def start_game?
         puts "Do you know how to play? (Y/N)"
         y_or_n=gets.chomp 
 
@@ -18,12 +22,9 @@ class Controller
         elsif y_or_n.downcase=="n"
             rules
         else 
-            while y_or_n.downcase!="y" && y_or_n.downcase!="n"   do 
-                puts "Do you know how to play? (Y/N)"
-                y_or_n=gets.chomp 
-            end 
+            start_game?
         end 
-    end 
+    end
 
     def begin_game 
         #shuffle all Fact instances and store in variable facts
@@ -36,9 +37,33 @@ class Controller
             fact=facts.pop
             #Ask a question that will begin falling down screen
             ask_question(10, fact)
-           
         end 
+
+        game_over
     end 
+
+    def game_over
+        game_over_screen
+        sleep(2)
+        print_text(5, 5, 75, "You got #{@@current_game.score} points!")
+        sleep(2)
+        retry?
+    end
+
+    def retry?
+        print_text(5, 5, 75, "Retry? (Y/N)")
+     
+        y_or_n=gets.chomp 
+        if y_or_n.downcase=="y"
+            @@last_game = @@current_game
+            @@current_game = Game.new(username: @@last_game.username)
+            begin_game
+        elsif y_or_n.downcase=="n"
+            return
+        else
+            retry?
+        end
+    end
 
     def self.welcome 
 
@@ -47,40 +72,18 @@ class Controller
     end 
 
     def rules 
-        puts "When a game begins questions will begin falling down your screen.".red
-        sleep 6
+        puts "When a game begins, questions will begin falling down your screen.".red
         puts "Don't be scared! You have until the question hits the floor (bottom of your screen) to answer.".blue
-        sleep 6
         puts "All questions are true/false and are answered with a 't' or a 'f'".green
-        sleep 6
         puts "For each question you answer correctly, your score will go up by 1.".red
-        sleep 6
-        puts "For each question you answer incorrectly you lose 1 life point.".blue
-        sleep 6
-        puts "If you fail to answer a question before it hits the floor you also lose 1 life point.".green
-        sleep 6
-        puts "You start each game with 3 life points. And it is game over when you hit 0 life points.".red
-        sleep 6
-        puts "After answering each question. You will automatically be moved to answering the next question.".blue
-        sleep 6
-        puts "The current question you are answering will be highlighted.".green
-        sleep 6
-        puts "You must answer questions in order from bottom up.".cyan
-        sleep 6
+        puts "However! You can only give three wrong answers before it is game over.".blue
+        puts "Letting a question hit the floor counts as giving a wrong answer.".green
+        puts "After answering each question, you will automatically be moved to answering the next question.".red
 
-        puts "Would you like to hear the rules again? (Y/N)"
-        again=gets.chomp
-        if again.downcase=="y"
-            rules
-        elsif y_or_n.downcase=="n"
-            begin_game
-        else 
-            while y_or_n.downcase!="y" && y_or_n.downcase!="n"   do 
-                puts "Would you like to hear the rules again? (Y/N)"
-                y_or_n=gets.chomp 
-            end 
-        end 
-    end 
+        sleep(3)
+
+        start_game?
+    end
 
     #method that prints test in the correct vertical position
     def print_text(lines_top, lines_bottom, spaces, text)
@@ -100,6 +103,7 @@ class Controller
 #method that sends a fact falling from the top of the screen and takes in an answer
     def ask_question(lines, fact)
         bottomlines = lines
+        timer = lines
         
         begin
             scrolling_text = Thread.new{
@@ -109,8 +113,10 @@ class Controller
                         sleep(1)
                     elsif @@current_game.score>=5 && @@current_game.score<10
                         sleep(0.8)
+                        timer = lines * 0.8
                     else 
                         sleep(0.5)
+                        timer = lines * 0.5
                     end
                     print_text(lines - bottomlines, bottomlines, spaces, fact.fact)
                     bottomlines -= 1
@@ -118,22 +124,24 @@ class Controller
             }
             
             
-            get_answer = Timeout::timeout(lines) {answer = gets.chomp}
+            get_answer = Timeout::timeout(timer) {answer = gets.chomp}
             if (get_answer.downcase=="t" && fact.true_or_false=="True") || (get_answer.downcase=="f" && fact.true_or_false=="False")
                 scrolling_text.kill
                 @@current_game.score+=1
             else
                 scrolling_text.kill
-                @@lives-=1
+                @@lives -=1
             end
+            print_text(5, 5, 75, fact.true_or_false)
             scrolling_text.join
         rescue Timeout::Error
-            print_test(5,5,10, "you lose!")
+            scrolling_text.kill
+            @@lives -= 1
         end
     end
 
     def game_over_screen
-        print ("                                             .         .                                                                                                   
+        print_text(0,1,0,"                                             .         .                                                                                                   
             ,o888888o.         .8.                  ,8.       ,8.         8 8888888888               ,o888888o. `8.`888b           ,8'8 8888888888  8 888888888o.  
            8888     `88.      .888.                ,888.     ,888.        8 8888                  . 8888     `88.`8.`888b         ,8' 8 8888        8 8888    `88. 
         ,8 8888       `8.    :88888.              .`8888.   .`8888.       8 8888                 ,8 8888       `8b`8.`888b       ,8'  8 8888        8 8888     `88 
@@ -143,11 +151,11 @@ class Controller
         88 8888   8888888.8' `8. `88888.      ,8'   `8.`88'   `8.`8888.   8 8888                 88 8888        ,8P   `8.`888b8'      8 8888        8 8888`8b      
         `8 8888       .8.8'   `8. `88888.    ,8'     `8.`'     `8.`8888.  8 8888                 `8 8888       ,8P     `8.`888'       8 8888        8 8888 `8b.    
            8888     ,88.888888888. `88888.  ,8'       `8        `8.`8888. 8 8888                  ` 8888     ,88'       `8.`8'        8 8888        8 8888   `8b.  
-            `8888888P'.8'       `8. `88888.,8'         `         `8.`8888.8 888888888888             `8888888P'          `8.`         8 8888888888888 8888     `88.  ")
+            `8888888P'.8'       `8. `88888.,8'         `         `8.`8888.8 888888888888             `8888888P'          `8.`         8 8888888888888 8888     `88.  ".yellowish)
     end
 
     def high_scores_title
-        print("                                                                                                                           
+        print_text(0, 1, 0,"                                                                                                                           
         8 8888        8 8 8888            d888888o.      ,o888888o.       ,o888888o.    8 888888888o.  8 8888888888    d888888o.  
         8 8888        8 8 8888          .`8888:' `88.   8888     `88.  . 8888     `88.  8 8888    `88. 8 8888        .`8888:' `88.
         8 8888        8 8 8888          8.`8888.   Y8,8 8888       `8.,8 8888       `8b 8 8888     `88 8 8888        8.`8888.   Y8
@@ -157,11 +165,11 @@ class Controller
         8 8888888888888 8 8888             `8.`8888. 88 8888          88 8888        ,8P8 8888`8b      8 8888           `8.`8888. 
         8 8888        8 8 8888         8b   `8.`8888.`8 8888       .8'`8 8888       ,8P 8 8888 `8b.    8 8888       8b   `8.`8888.
         8 8888        8 8 8888         `8b.  ;8.`8888   8888     ,88'  ` 8888     ,88'  8 8888   `8b.  8 8888       `8b.  ;8.`8888
-        8 8888        8 8 8888          `Y8888P ,88P'    `8888888P'       `8888888P'    8 8888     `88.8 888888888888`Y8888P ,88P'")
+        8 8888        8 8 8888          `Y8888P ,88P'    `8888888P'       `8888888P'    8 8888     `88.8 888888888888`Y8888P ,88P'".yellowish)
     end
 
     def main_menu
-        print ("
+        print_text(0, 1, 0, "
               .         .                                                                         .         .                                                      
              ,8.       ,8.                  .8.          8 8888b.             8                  ,8.       ,8.         8 8888888888  b.             88 8888      88
             ,888.     ,888.                .888.         8 8888888o.          8                 ,888.     ,888.        8 8888        888o.          88 8888      88
@@ -172,7 +180,7 @@ class Controller
        ,8'   `8.`88'   `8.`8888.      .8' `8. `88888.    8 88888   `Y8o. `Y8888            ,8'   `8.`88'   `8.`8888.   8 8888        8   `Y8o. `Y88888 8888      88
       ,8'     `8.`'     `8.`8888.    .8'   `8. `88888.   8 88888      `Y8o. `Y8           ,8'     `8.`'     `8.`8888.  8 8888        8      `Y8o. `Y8` 8888     ,8P
      ,8'       `8        `8.`8888.  .888888888. `88888.  8 88888         `Y8o.`          ,8'       `8        `8.`8888. 8 8888        8         `Y8o.`  8888   ,d8P 
-    ,8'         `         `8.`8888..8'       `8. `88888. 8 88888            `Yo         ,8'         `         `8.`8888.8 8888888888888            `Yo   `Y88888P'  ")
+    ,8'         `         `8.`8888..8'       `8. `88888. 8 88888            `Yo         ,8'         `         `8.`8888.8 8888888888888            `Yo   `Y88888P'  ".yellowish)
     end
     
     
