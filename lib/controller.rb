@@ -42,7 +42,7 @@ class Controller
             ask_question(10, fact)
             break if Question.all.where("game_id = ?", @@current_game.id).length >= 50
         end 
-
+        @@current_game.save
         game_over
     end 
 
@@ -63,7 +63,7 @@ class Controller
             @@current_game = Game.new(username: @@last_game.username)
             begin_game
         elsif y_or_n.downcase=="n"
-            return
+            intro
         else
             retry?
         end
@@ -151,6 +151,7 @@ class Controller
             sleep(1)
             print_text(5, 5, 75, "Current lives: #{@@lives}")
         end
+        question.save
     end
 
     def game_over_screen
@@ -199,7 +200,8 @@ class Controller
         puts "1. New Game"
         puts "2. High Scores"
         puts "3. Rules"
-        print "Enter 1 to start a new game; 2 for High Scores; 3 to go over the rules: "
+        puts "4. Quit Game"
+        print "Enter 1 to start a new game; 2 for High Scores; 3 to go over the rules; 4 to quit: "
 
         choice=gets.chomp
 
@@ -212,6 +214,8 @@ class Controller
         elsif choice=="3"
             rules
             main_menu 
+        elsif choice=="4"
+            exit
         else 
             main_menu
         end
