@@ -37,6 +37,7 @@ class Controller
             fact=facts.pop
             #Ask a question that will begin falling down screen
             ask_question(10, fact)
+            break if (Question.all.length >= 50)
         end 
 
         game_over
@@ -104,10 +105,11 @@ class Controller
     def ask_question(lines, fact)
         bottomlines = lines
         timer = lines
+        question = Question.new(game: @@current_game, fact: fact)
         
         begin
             scrolling_text = Thread.new{
-                spaces = rand(100)
+                spaces = rand(150) - question.fact.fact.length
                 while bottomlines >= 0
                     if @@current_game.score<5
                         sleep(1)
@@ -118,21 +120,23 @@ class Controller
                         sleep(0.5)
                         timer = lines * 0.5
                     end
-                    print_text(lines - bottomlines, bottomlines, spaces, fact.fact)
+                    print_text(lines - bottomlines, bottomlines, spaces, question.fact.fact)
                     bottomlines -= 1
                 end
             }
             
             
             get_answer = Timeout::timeout(timer) {answer = gets.chomp}
-            if (get_answer.downcase=="t" && fact.true_or_false=="True") || (get_answer.downcase=="f" && fact.true_or_false=="False")
+            if (get_answer.downcase=="t" && question.fact.true_or_false=="True") || (get_answer.downcase=="f" && question.fact.true_or_false=="False")
                 scrolling_text.kill
                 @@current_game.score+=1
+                question.answered_correctly = true
             else
                 scrolling_text.kill
                 @@lives -=1
+                question.answered_correctly = false
             end
-            print_text(5, 5, 75, fact.true_or_false)
+            print_text(5, 5, 75, question.fact.true_or_false)
             scrolling_text.join
         rescue Timeout::Error
             scrolling_text.kill
