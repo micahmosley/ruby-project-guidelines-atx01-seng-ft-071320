@@ -32,6 +32,7 @@ class Controller
         
         #shuffle all Fact instances and store in variable facts
         facts=Fact.all.shuffle
+        facts=facts.uniq
         @@current_game.score=0
         @@lives=3
         
@@ -84,7 +85,7 @@ class Controller
         puts "Letting a question hit the floor counts as giving a wrong answer.".green
         puts "After answering each question, you will automatically be moved to answering the next question.".red
 
-        sleep(3)
+        sleep(20)
 
     end
 
