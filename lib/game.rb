@@ -4,10 +4,6 @@ class Game < ActiveRecord::Base
 
     def self.high_scores
         Game.all.order(score: :desc).limit(5)
-        # games.each do |game|
-        #     print game.username+"      "
-        #     puts game.score.to_s.yellow
-        # end 
     end
 
     def self.high_score_table
@@ -17,7 +13,7 @@ class Game < ActiveRecord::Base
             i = 0
             while i < Game.high_scores.length do
                 t.add_separator
-                t.add_row [i+1, Game.high_scores[i].username, Game.high_scores[i].score]
+                t.add_row [i+1, Game.high_scores[i].username, Game.high_scores[i].score.to_s.yellow]
                 i += 1
             end
         end
