@@ -50,7 +50,10 @@ class Controller
     def game_over
         game_over_screen
         sleep(2)
-        print_text(5, 5, 75, "You got #{@@current_game.score} points!")
+        print_text(5, 0, 75, "You got #{@@current_game.score} points!")
+        if Game.high_scores.include?(@@current_game)
+            puts "\n High Score!"
+        end
         sleep(2)
         retry?
     end
@@ -175,7 +178,7 @@ class Controller
     end
 
     def game_over_screen
-        print_text(0,1,0,"                                             .         .                                                                                                   
+        print_text(0,1,0,"                                                     .         .                                                                                                   
             ,o888888o.         .8.                  ,8.       ,8.         8 8888888888               ,o888888o. `8.`888b           ,8'8 8888888888  8 888888888o.  
            8888     `88.      .888.                ,888.     ,888.        8 8888                  . 8888     `88.`8.`888b         ,8' 8 8888        8 8888    `88. 
         ,8 8888       `8.    :88888.              .`8888.   .`8888.       8 8888                 ,8 8888       `8b`8.`888b       ,8'  8 8888        8 8888     `88 
