@@ -157,7 +157,12 @@ class Controller
                 @@lives -=1
                 question.answered_correctly = false
             end
-            print_text(5, 5, 75, question.fact.true_or_false)
+            question.save
+            if question.answered_correctly == true
+                print_text(5, 5, 75, question.fact.true_or_false.green)
+            else
+                print_text(5, 5, 75, question.fact.true_or_false.red)
+            end
             sleep(1)
             print_text(5, 5, 75, "Current lives: #{@@lives}")
             if @@current_game.score==5 && question.answered_correctly== true
@@ -173,11 +178,11 @@ class Controller
             scrolling_text.kill
             @@lives -= 1
             question.answered_correctly = false
-            print_text(5, 5, 75, question.fact.true_or_false)
+            question.save
+            print_text(5, 5, 75, question.fact.true_or_false.red)
             sleep(1)
             print_text(5, 5, 75, "Current lives: #{@@lives}")
         end
-        question.save
     end
 
     def game_over_screen
