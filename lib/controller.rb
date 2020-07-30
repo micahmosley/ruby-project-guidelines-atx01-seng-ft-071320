@@ -142,6 +142,13 @@ class Controller
             print_text(5, 5, 75, question.fact.true_or_false)
             sleep(1)
             print_text(5, 5, 75, "Current lives: #{@@lives}")
+            if @@current_game.score==5
+                print_text(5, 5, 75, "Wow, you're good! Let's speed it up a bit.")
+                sleep(1)
+            elsif @@current_game.score==10
+                print_text(5, 5, 75, "This is too easy. Get ready to see some real speed.")
+                sleep(1)
+            end 
 
             scrolling_text.join
         rescue Timeout::Error
