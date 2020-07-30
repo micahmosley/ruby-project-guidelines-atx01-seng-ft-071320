@@ -1,7 +1,9 @@
 class Controller
 
     def intro
-        import_to_database 
+        if Fact.all.length<50
+            import_to_database 
+        end 
         main_menu
         puts "Hello, brave user. What is your name?"
         name=gets.chomp
