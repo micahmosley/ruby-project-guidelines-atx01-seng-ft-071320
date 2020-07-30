@@ -77,6 +77,16 @@ class Controller
     end 
 
     def rules 
+        print_text(0, 2, 0, "8 888888888o. 8 8888      888 8888        8 8888888888    d888888o.  
+8 8888    `88.8 8888      888 8888        8 8888        .`8888:' `88.
+8 8888     `888 8888      888 8888        8 8888        8.`8888.   Y8
+8 8888     ,888 8888      888 8888        8 8888        `8.`8888.    
+8 8888.   ,88'8 8888      888 8888        8 888888888888 `8.`8888.   
+8 888888888P' 8 8888      888 8888        8 8888          `8.`8888.  
+8 8888`8b     8 8888      888 8888        8 8888           `8.`8888. 
+8 8888 `8b.   ` 8888     ,8P8 8888        8 8888       8b   `8.`8888.
+8 8888   `8b.   8888   ,d8P 8 8888        8 8888       `8b.  ;8.`8888
+8 8888     `88.  `Y88888P'  8 8888888888888 888888888888`Y8888P ,88P'".yellowish)
         puts "When a game begins, questions will begin falling down your screen.".red
         puts "Don't be scared! You have until the question hits the floor (bottom of your screen) to answer.".blue
         puts "All questions are true/false and are answered with a 't' or a 'f'".green
@@ -85,7 +95,9 @@ class Controller
         puts "Letting a question hit the floor counts as giving a wrong answer.".green
         puts "After answering each question, you will automatically be moved to answering the next question.".red
 
-        sleep(20)
+        puts "\n Press enter to return to Main Menu"
+        go_back = gets.chomp
+        main_menu
 
     end
 
@@ -176,7 +188,7 @@ class Controller
             `8888888P'.8'       `8. `88888.,8'         `         `8.`8888.8 888888888888             `8888888P'          `8.`         8 8888888888888 8888     `88.  ".yellowish)
     end
 
-    def high_scores_title
+    def high_scores
         print_text(0, 1, 0,"                                                                                                                           
         8 8888        8 8 8888            d888888o.      ,o888888o.       ,o888888o.    8 888888888o.  8 8888888888    d888888o.  
         8 8888        8 8 8888          .`8888:' `88.   8888     `88.  . 8888     `88.  8 8888    `88. 8 8888        .`8888:' `88.
@@ -188,6 +200,10 @@ class Controller
         8 8888        8 8 8888         8b   `8.`8888.`8 8888       .8'`8 8888       ,8P 8 8888 `8b.    8 8888       8b   `8.`8888.
         8 8888        8 8 8888         `8b.  ;8.`8888   8888     ,88'  ` 8888     ,88'  8 8888   `8b.  8 8888       `8b.  ;8.`8888
         8 8888        8 8 8888          `Y8888P ,88P'    `8888888P'       `8888888P'    8 8888     `88.8 888888888888`Y8888P ,88P'".yellowish)
+        Game.high_score_table
+        puts "\n Press enter to return to Main Menu"
+        go_back = gets.chomp
+        main_menu
     end
 
     def main_menu
@@ -216,12 +232,9 @@ class Controller
         if choice=="1"
             return 
         elsif choice=="2"
-            Game.high_scores
-            sleep(3)
-            main_menu
+            high_scores
         elsif choice=="3"
             rules
-            main_menu 
         elsif choice=="4"
             exit
         else 
