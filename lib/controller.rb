@@ -8,7 +8,7 @@ class Controller
         #create new instance of game and store user's name into username
         @@current_game=Game.new(username: name)
 
-        puts "Mighty #{name}! Welcome to ____!"
+        puts "Mighty #{name.red}! Welcome to ____!"
         start_game?
     end 
 
@@ -142,10 +142,10 @@ class Controller
             print_text(5, 5, 75, question.fact.true_or_false)
             sleep(1)
             print_text(5, 5, 75, "Current lives: #{@@lives}")
-            if @@current_game.score==5
+            if @@current_game.score==5 && question.answered_correctly== true
                 print_text(5, 5, 75, "Wow, you're good! Let's speed it up a bit.")
                 sleep(1)
-            elsif @@current_game.score==10
+            elsif @@current_game.score==10 && question.answered_correctly == true
                 print_text(5, 5, 75, "This is too easy. Get ready to see some real speed.")
                 sleep(1)
             end 
