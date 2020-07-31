@@ -1,5 +1,6 @@
 class Controller
 
+    #we start here
     def intro
         if Fact.all.length<50
             import_to_database 

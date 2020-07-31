@@ -7,6 +7,7 @@ class Game < ActiveRecord::Base
     end
 
     def self.high_score_table
+        #uses the terminal-table gem to make a high score table
         table = Terminal::Table.new do |t|
             t.style = {:width => 50}
             t.headings = [' ', 'Player', 'Score']
