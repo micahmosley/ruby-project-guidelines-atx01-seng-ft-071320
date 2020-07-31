@@ -35,17 +35,17 @@ class Controller
         
         #shuffle all Fact instances and store in variable facts
         facts=Fact.all.shuffle
-        facts=facts.uniq
         @@current_game.score=0
         @@lives=3
         
-        #need to make a case for if we run out of questions
         while @@lives>0 do 
             fact=facts.pop
             #Ask a question that will begin falling down screen
             ask_question(10, fact)
+            #ends game if we run out of questions
             break if Question.all.where("game_id = ?", @@current_game.id).length >= 50
         end 
+        #saves the score in the database
         @@current_game.save
         game_over
     end 
@@ -66,6 +66,7 @@ class Controller
      
         y_or_n=gets.chomp 
         if y_or_n.downcase=="y"
+            #creates a new game instance with the same username as the last one
             @@last_game = @@current_game
             @@current_game = Game.new(username: @@last_game.username)
             begin_game
@@ -75,12 +76,6 @@ class Controller
             retry?
         end
     end
-
-    def self.welcome 
-
-        puts "WELCOME TO _____"
-
-    end 
 
     def rules 
         print_text(0, 2, 0, "8 888888888o. 8 8888      888 8888        8 8888888888    d888888o.  
@@ -109,6 +104,7 @@ class Controller
 
     #method that prints test in the correct vertical position
     def print_text(lines_top, lines_bottom, spaces, text)
+        #this line clears the screen
         puts "\e[2J\e[f"
         lines_top.times do
             print "\n"
@@ -132,6 +128,7 @@ class Controller
             scrolling_text = Thread.new{
                 spaces = rand(150) - question.fact.fact.length
                 while bottomlines >= 0
+                    #set speed based on score
                     if @@current_game.score<5
                         sleep(1)
                     elsif @@current_game.score>=5 && @@current_game.score<10
@@ -143,6 +140,7 @@ class Controller
                     end
                     print_text(lines - bottomlines, bottomlines, spaces, question.fact.fact)
                     bottomlines -= 1
+                    #this next line just draws the "floor"
                     puts("=" * 150)
                 end
             }
@@ -157,6 +155,7 @@ class Controller
                 @@lives -=1
                 question.answered_correctly = false
             end
+            #saves whether the question was answered correctly
             question.save
             if question.answered_correctly == true
                 print_text(5, 5, 75, question.fact.true_or_false.green)
@@ -175,6 +174,7 @@ class Controller
             end 
 
             scrolling_text.join
+        #if time runs out
         rescue Timeout::Error
             scrolling_text.kill
             @@lives -= 1
