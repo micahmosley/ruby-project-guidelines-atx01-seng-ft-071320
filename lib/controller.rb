@@ -53,12 +53,12 @@ class Controller
 
     def game_over
         game_over_screen
-        sleep(2)
+        sleep(4)
         print_text(5, 0, 75, "You got #{@@current_game.score} points!")
         if Game.high_scores.include?(@@current_game)
             puts "\n" + " " * 85 + "High Score!"
         end
-        sleep(2)
+        sleep(4)
         retry?
     end
 
